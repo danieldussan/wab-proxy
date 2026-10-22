@@ -34,7 +34,7 @@ Probado con 3 cuentas, VPS en RackNerd, iPhone por Tailscale (Wi-Fi y datos móv
 
 Se ejecutan en una copia temporal, sin VPS ni proxies reales (usan un SOCKS5 de prueba, `tests/fake_socks5.py`):
 
-- Generación del compose (huecos de numeración, puertos, imagen fijada).
+- Generación del compose (huecos de numeración, puertos, imagen fijada, sin credenciales ni `-F`, contenedores endurecidos) y de `conf/gw-N.json` en la VPS (permisos y borrado de cuentas eliminadas).
 - Panel: autenticación por token, tokens de panel y de agente separados, rechazo de Host/Origin ajenos, CSP sin `unsafe-inline`, guardado de `.env` (permisos 600, codificación de contraseñas con `@ : / #`, nunca devuelve la clave), validación de entradas, verificación de proxies (incluido el caso «solo funciona por algunas IPs de la pasarela») y VPS.
 - Canal del agente (`wa agent`): pedir credenciales (la contraseña no llega al agente ni a los eventos), pedir la VPS, confirmar, rechazo (código 1), tiempo agotado (2), panel cerrado (3), y que preparar/desplegar/apagar **no se ejecutan** sin aprobar.
 - Subida a la VPS con un `ssh` falso: qué archivos viajan (`docker-compose.yml`, `.env`), que `bootstrap-vps.sh` se sube y que la contraseña de root nunca aparece en la salida.

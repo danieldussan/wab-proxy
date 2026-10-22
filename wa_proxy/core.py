@@ -247,13 +247,24 @@ def generate_compose(accounts=None):
         raise ApiError("No hay ningún proxy guardado (PROXY_n con valor en .env)")
     out = ["# GENERADO por wa-proxy — no editar a mano.",
            "# Los puertos se atan SOLO a la IP de Tailscale (TS_IP): nada queda expuesto a internet.",
+           "# Las credenciales NO van aquí ni en la línea de comandos: gost lee conf/gw-N.json, que la VPS",
+           "# genera desde su .env al aplicar (así no salen en `docker inspect`, `ps` ni `docker compose config`).",
+           "",
+           "x-gw: &gw",
+           "  image: ginuerzh/gost:2.12.0",
+           "  restart: unless-stopped",
+           "  read_only: true",
+           "  cap_drop: [ALL]",
+           "  security_opt: [no-new-privileges:true]",
+           "  mem_limit: 128m",
+           "  pids_limit: 256",
+           '  command: ["-C", "/etc/gost/gost.json"]',
            "", "services:"]
     for n in nums:
-        out += [f"  gw-{n}:", "    image: ginuerzh/gost:2.12.0", "    restart: unless-stopped", "    ports:",
+        out += [f"  gw-{n}:", "    <<: *gw", "    ports:",
                 f'      - "${{TS_IP}}:{5100 + n}:5222"', f'      - "${{TS_IP}}:{5200 + n}:7777"',
-                f'      - "${{TS_IP}}:{5300 + n}:8443"', "    command: >",
-                "      -L tcp://:5222/g.whatsapp.net:5222", "      -L tcp://:7777/whatsapp.net:443",
-                "      -L tcp://:8443/${PROBE_HOST:-api.ipify.org}:443", f"      -F ${{PROXY_{n}}}"]
+                f'      - "${{TS_IP}}:{5300 + n}:8443"', "    volumes:",
+                f"      - ./conf/gw-{n}.json:/etc/gost/gost.json:ro"]
     return "\n".join(out) + "\n"
 
 
@@ -555,15 +566,41 @@ done
 
 APPLY_SCRIPT = r"""
 set -euo pipefail
+umask 077
 pull=$1; cd ~/"$2"
 command -v docker >/dev/null || { echo "   Docker no instalado (ejecuta: wa prepare)"; exit 1; }
+command -v python3 >/dev/null || { echo "   Falta python3 en la VPS"; exit 1; }
 TSIP=$(tailscale ip -4 | head -1)
 [ -n "$TSIP" ] || { echo "   Tailscale sin IP en esta VPS"; exit 1; }
 if grep -q '^TS_IP=' .env; then sed -i "s/^TS_IP=.*/TS_IP=$TSIP/" .env; else echo "TS_IP=$TSIP" >> .env; fi
 chmod 600 .env
+[ ! -f .env.bak ] || chmod 600 .env.bak
+python3 - <<'PY'
+import glob, json, os, re
+probe = "api.ipify.org"
+proxies = {}
+for line in open(".env", encoding="utf-8"):
+    m = re.match(r'^PROXY_(\d+)="?(.*?)"?\s*$', line)
+    if m and m.group(2):
+        proxies[m.group(1)] = m.group(2)
+    m = re.match(r'^PROBE_HOST="?(.*?)"?\s*$', line)
+    if m and m.group(1):
+        probe = m.group(1)
+os.makedirs("conf", exist_ok=True)
+os.chmod("conf", 0o700)
+for old in glob.glob("conf/gw-*.json"):
+    os.remove(old)
+for n, url in proxies.items():
+    path = "conf/gw-%s.json" % n
+    with open(path, "w") as f:
+        json.dump({"ServeNodes": ["tcp://:5222/g.whatsapp.net:5222", "tcp://:7777/whatsapp.net:443",
+                                  "tcp://:8443/%s:443" % probe],
+                   "ChainNodes": [url]}, f)
+    os.chmod(path, 0o644)  # el contenedor corre sin capacidades; la carpeta 700 impide el acceso a otros usuarios
+PY
 missing=0
-for v in $(grep -oE '\$\{PROXY_[0-9]+\}' docker-compose.yml | tr -d '${}' | sort -u); do
-  grep -q "^$v=..*" .env || { echo "   FALTA $v en .env"; missing=1; }
+for f in $(grep -oE './conf/gw-[0-9]+\.json' docker-compose.yml | sort -u); do
+  [ -f "$f" ] || { echo "   FALTA el PROXY_n de $f en .env"; missing=1; }
 done
 [ "$missing" = 0 ] || exit 1
 docker compose config -q
@@ -574,8 +611,8 @@ docker compose ps --format 'table {{.Name}}\t{{.Status}}'
 echo "   IP de Tailscale (úsala en el iPhone): $TSIP"
 """
 
-BACKUP_CMD = ("mkdir -p ~/{d} && cd ~/{d} && cp -f docker-compose.yml docker-compose.yml.bak 2>/dev/null; "
-              "cp -f .env .env.bak 2>/dev/null; true").format(d=REMOTE_DIR)
+BACKUP_CMD = ("umask 077; mkdir -p ~/{d} && cd ~/{d} && cp -f docker-compose.yml docker-compose.yml.bak 2>/dev/null; "
+              "cp -f .env .env.bak 2>/dev/null && chmod 600 .env.bak; true").format(d=REMOTE_DIR)
 
 
 def vps_status(host):

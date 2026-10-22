@@ -133,9 +133,31 @@ class Core(unittest.TestCase):
         self.assertIn("5103:5222", c)
         self.assertIn("ginuerzh/gost:2.12.0", c)
         self.assertNotIn("pppp", c)                                  # el compose no lleva secretos
+        self.assertNotIn("-F", c)                                    # ni credenciales en la línea de comandos
+        self.assertIn("./conf/gw-3.json:/etc/gost/gost.json:ro", c)
+        for opt in ("read_only: true", "cap_drop: [ALL]", "no-new-privileges:true"):
+            self.assertIn(opt, c)
         with self.assertRaises(core.ApiError):
             reset_files()
             core.generate_compose()
+
+    @unittest.skipIf(core.IS_WIN, "script de la VPS (Linux)")
+    def test_apply_script_writes_private_conf(self):
+        core.save_accounts([{"n": 2, "host": "h.com", "port": 7, "user": "u", "password": "s3cr3t:pw@x"}])
+        py = re.search(r"python3 - <<'PY'\n(.*?)\nPY\n", core.APPLY_SCRIPT, re.S).group(1)
+        d = tempfile.mkdtemp(dir=TMP)
+        with open(core.ENV_FILE, encoding="utf-8") as src, open(os.path.join(d, ".env"), "w", encoding="utf-8") as dst:
+            dst.write(src.read())
+        os.makedirs(os.path.join(d, "conf"))
+        open(os.path.join(d, "conf", "gw-9.json"), "w").close()      # cuenta borrada: debe desaparecer
+        subprocess.run([sys.executable, "-c", py], cwd=d, check=True)
+        self.assertEqual(os.listdir(os.path.join(d, "conf")), ["gw-2.json"])
+        self.assertEqual(stat.S_IMODE(os.stat(os.path.join(d, "conf")).st_mode), 0o700)
+        cfg = json.load(open(os.path.join(d, "conf", "gw-2.json")))
+        self.assertEqual(cfg["ChainNodes"], ["socks5://u:s3cr3t%3Apw%40x@h.com:7"])
+        self.assertIn("tcp://:5222/g.whatsapp.net:5222", cfg["ServeNodes"])
+        self.assertIn("umask 077", core.BACKUP_CMD)
+        self.assertIn("chmod 600 .env.bak", core.BACKUP_CMD)
 
     def test_vps_validation(self):
         core.add_vps({"ip": "203.0.113.9"})

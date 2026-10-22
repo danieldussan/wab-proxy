@@ -87,7 +87,7 @@ Cuenta *n* (en la IP de Tailscale de la VPS): chat `5100+n`, medios `5200+n`, so
 - El agente de IA usa un token **distinto** al del panel y no puede preparar/desplegar/apagar sin que lo apruebes. Límite honesto: esto protege contra errores y malentendidos, no contra un agente malicioso con acceso total a tu terminal (podría leer `.env`). Usa solo agentes en los que confíes.
 - Las contraseñas de `.env` quedan en texto plano en tu equipo (hace falta para Docker) con permisos 600 en Linux/macOS; en Windows ese permiso no se puede garantizar.
 - Los puertos de los proxies solo escuchan en la IP de Tailscale; el firewall deja solo SSH público y se instala fail2ban.
-- Las credenciales de los proxies son visibles con `docker inspect` en la VPS: protege el acceso a ella.
+- Las credenciales no salen en `docker inspect`, `ps` ni `docker compose config`: gost las lee de `~/wa-proxy/conf/` (carpeta 700), que se genera en la VPS desde su `.env`. Quien sea root en la VPS sí puede leerlas: protege el acceso a ella. Los contenedores corren con `read_only`, sin capacidades y con límite de memoria.
 
 ## Licencia
 
