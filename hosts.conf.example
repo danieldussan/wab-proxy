@@ -1,0 +1,5 @@
+# Una VPS por línea:  alias=usuario@ip-publica
+# Copia este archivo a hosts.conf y edítalo.
+#   cp hosts.conf.example hosts.conf
+vps1=wa@203.0.113.10
+#vps2=wa@203.0.113.11

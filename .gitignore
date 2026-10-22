@@ -1,0 +1,18 @@
+# Secretos y configuración local: NUNCA se suben
+.env
+.env.*
+!.env.example
+hosts.conf
+!hosts.conf.example
+
+# Generado por scripts/generate-compose.sh
+docker-compose.yml
+
+# Copias de seguridad
+*.bak
+*~
+
+# Temporales del panel y de pruebas
+*.tmp
+__pycache__/
+tests/.nokey*
