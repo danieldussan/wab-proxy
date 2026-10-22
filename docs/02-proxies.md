@@ -12,9 +12,9 @@ Ejemplo probado: Decodo ISP (`isp.decodo.com`), donde el **puerto** elige la IP 
 
 ## Cargarlos
 
-**Con el panel (`./start-dashboard.sh`), paso 1:** escribe servidor, puerto, usuario y contraseña de cada cuenta, o pega la URL `socks5://usuario:clave@servidor:puerto`. Pulsa **Guardar** y **Probar proxies**. El panel codifica los caracteres especiales de la contraseña por ti.
+**Con el panel (`./wa dashboard`), pestaña Proxies:** escribe servidor, puerto, usuario y contraseña de cada cuenta, o pega la URL `socks5://usuario:clave@servidor:puerto`. Pulsa **Guardar** y **Probar proxies**. El panel codifica los caracteres especiales de la contraseña por ti.
 
-**A mano:** copia `.env.example` a `.env`, rellena `PROXY_1`, `PROXY_2`… y codifica los caracteres especiales (`@`→`%40`, `:`→`%3A`, `/`→`%2F`, `#`→`%23`, `%`→`%25`, `$`→`%24`). Luego `./scripts/verify-proxies.sh`.
+**A mano:** copia `.env.example` a `.env`, rellena `PROXY_1`, `PROXY_2`… y codifica los caracteres especiales (`@`→`%40`, `:`→`%3A`, `/`→`%2F`, `#`→`%23`, `%`→`%25`, `$`→`%24`). Luego `./wa verify`.
 
 ## Qué debe salir en la prueba
 

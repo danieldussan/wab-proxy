@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prepara una VPS NUEVA (Debian/Ubuntu). Normalmente lo lanza prepare-vps.sh;
+# Prepara una VPS NUEVA (Debian/Ubuntu). Normalmente lo lanza `wa prepare` (o el panel);
 # también puede ejecutarse a mano como root EN la VPS.
 # Hace: usuario "wa" con tu clave SSH, Docker, Tailscale, firewall (solo SSH),
 # fail2ban y orden de arranque (Docker espera a Tailscale tras un reinicio).

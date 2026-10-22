@@ -1,6 +1,6 @@
 # VPS de prueba local (sin pagar ni crear cuentas)
 
-`start-vm.sh` levanta una VM **Ubuntu 24.04 real** (systemd, apt, sshd) con QEMU/KVM, con login de root por contraseña, como la que te entrega un proveedor. Sirve para probar `prepare-vps.sh`, `deploy.sh` y el panel de punta a punta.
+`start-vm.sh` levanta una VM **Ubuntu 24.04 real** (systemd, apt, sshd) con QEMU/KVM, con login de root por contraseña, como la que te entrega un proveedor. Sirve para probar `wa prepare`, `wa deploy` y el panel de punta a punta.
 
 ```bash
 tests/vm/start-vm.sh        # primera vez descarga ~600 MB; luego arranca en segundos

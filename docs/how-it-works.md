@@ -30,14 +30,16 @@ Probado con 3 cuentas, VPS en RackNerd, iPhone por Tailscale (Wi-Fi y datos móv
 - Sin fuga al apagar el proxy (el mensaje queda pendiente; al reactivar, se envía).
 - Reconexión limpia al cambiar de Wi-Fi a datos.
 
-## Pruebas automáticas (`tests/smoke.sh`)
+## Pruebas automáticas (`python tests/run_tests.py`)
 
 Se ejecutan en una copia temporal, sin VPS ni proxies reales (usan un SOCKS5 de prueba, `tests/fake_socks5.py`):
 
 - Generación del compose (huecos de numeración, puertos, imagen fijada).
-- Panel: autenticación por token, rechazo de Host/Origin ajenos, guardado de `.env` (permisos 600, codificación de contraseñas con `@ : / #`, nunca devuelve la clave), validación de entradas, verificación de proxies y VPS.
+- Panel: autenticación por token, tokens de panel y de agente separados, rechazo de Host/Origin ajenos, CSP sin `unsafe-inline`, guardado de `.env` (permisos 600, codificación de contraseñas con `@ : / #`, nunca devuelve la clave), validación de entradas, verificación de proxies (incluido el caso «solo funciona por algunas IPs de la pasarela») y VPS.
+- Canal del agente (`wa agent`): pedir credenciales (la contraseña no llega al agente ni a los eventos), pedir la VPS, confirmar, rechazo (código 1), tiempo agotado (2), panel cerrado (3), y que preparar/desplegar/apagar **no se ejecutan** sin aprobar.
+- Subida a la VPS con un `ssh` falso: qué archivos viajan (`docker-compose.yml`, `.env`), que `bootstrap-vps.sh` se sube y que la contraseña de root nunca aparece en la salida.
 
-Además se probó con una **VPS simulada local** (`tests/vm/`, Ubuntu 24.04 real en QEMU/KVM con login de root por contraseña): preparación completa con contraseña desde el panel (instalación real de Docker, Tailscale, ufw y fail2ban), despliegue, sondas, apagar/encender cuentas y **reinicios de la VPS** (con la regla de arranque los contenedores vuelven con sus puertos; sin ella quedan caídos). Esa prueba encontró y corrigió un fallo silencioso de `bootstrap-vps.sh` (SIGPIPE con `pipefail`) y un enlace falso de Tailscale en el panel.
+Además se probó con una **VPS simulada local** (`tests/vm/`, Ubuntu 24.04 real en QEMU/KVM con login de root por contraseña): preparación completa con contraseña desde el panel (instalación real de Docker, Tailscale, ufw y fail2ban), despliegue, sondas, apagar/encender cuentas y **reinicios de la VPS** (con la regla de arranque los contenedores vuelven con sus puertos; sin ella quedan caídos). Se repitió completa con la versión en Python y el flujo del agente (aprobación en el panel, contraseña de root vía `SSH_ASKPASS`, repetir `prepare` sin contraseña). Esa prueba encontró y corrigió un fallo silencioso de `bootstrap-vps.sh` (SIGPIPE con `pipefail`) y un enlace falso de Tailscale en el panel.
 
 ## Qué NO está verificado
 
@@ -47,4 +49,4 @@ Además se probó con una **VPS simulada local** (`tests/vm/`, Ubuntu 24.04 real
 - Otros clientes distintos de iOS.
 - La autorización real en Tailscale (se simula la IP; el panel solo captura la URL) y Debian.
 - Rarezas de cada proveedor de VPS (por ejemplo, los que obligan a cambiar la contraseña en el primer inicio).
-- El panel en Windows/macOS (se probó en Linux).
+- **Windows y macOS**: se desarrolló y probó en Linux. El lanzador `wa.cmd`, el Python portable (`scripts/get-python.ps1`) y el uso de `SSH_ASKPASS` en Windows no se han podido ejecutar en un Windows real (ver [docs/05-windows.md](05-windows.md)).

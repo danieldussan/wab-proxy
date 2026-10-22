@@ -23,6 +23,6 @@ Sirve la VPS más barata de cualquier proveedor (RackNerd, Hetzner, DigitalOcean
 ## También necesitas
 
 - Una cuenta gratuita en [Tailscale](https://tailscale.com). Se usa la **misma cuenta** en la VPS y en el iPhone.
-- En tu equipo: **Python 3** y **ssh** (Linux, macOS, o Windows con [WSL](https://learn.microsoft.com/windows/wsl/install)).
+- En tu equipo: **ssh** (en Windows 10/11 ya viene) y **Python 3** en Linux/macOS (en Windows el lanzador lo descarga solo; ver [05-windows.md](05-windows.md)).
 
 Siguiente: [2. Proxies](02-proxies.md)

@@ -92,10 +92,10 @@ cat <<TXT
 
 VM lista.  IP: 127.0.0.1   puerto SSH: $VM_SSH_PORT   usuario: root   contraseña: $VM_ROOT_PASS
 
-Para usarla con el panel (los proxies de prueba deben apuntar a 10.0.2.2, que es tu equipo visto desde la VM):
+Para usarla con el panel o con ./wa prepare / ./wa deploy (los proxies de prueba deben apuntar a 10.0.2.2, que es tu equipo visto desde la VM):
   python3 tests/fake_socks5.py 19201 usuario clave &        # proxy SOCKS5 falso
   export WA_SSH_KEY=$VM_DIR/wakey
   export WA_SSH_EXTRA="-o Port=$VM_SSH_PORT -o UserKnownHostsFile=$VM_DIR/known_hosts"
-  ./start-dashboard.sh
+  ./wa dashboard
 En el panel: proxy servidor 10.0.2.2, puerto 19201 · VPS IP 127.0.0.1 · Preparar (usuario root + contraseña de arriba).
 TXT

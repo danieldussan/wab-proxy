@@ -7,37 +7,38 @@ Abre tu agente (Claude Code, Codex, OpenCode…) **dentro de la carpeta del repo
 ## Instalación guiada completa (recomendado)
 
 ```
-Lee AGENTS.md. Abre el panel (start-dashboard.sh --no-open), dame el enlace y guíame
-paso a paso para configurar mis proxies de WhatsApp en una VPS. Explica cada paso en
-una frase, verifica cada fase y pídeme confirmación antes de tocar la VPS.
-No leas mi .env ni me pidas contraseñas por el chat.
+Lee AGENTS.md. Abre el panel con `wa agent open` y guíame paso a paso para configurar
+mis proxies de WhatsApp en una VPS. Explica cada paso en una frase y verifica cada fase.
+Pídeme las credenciales y los permisos por el panel (wa agent), no por el chat.
+No leas mi .env.
 ```
 
 ## Solo diagnosticar
 
 ```
-Ejecuta ./scripts/doctor.sh y ./scripts/deploy.sh status, interpreta el resultado y dime
+Ejecuta `wa doctor` y `wa agent status`, interpreta el resultado y dime
 qué falla y cómo arreglarlo usando docs/04-troubleshooting.md. No leas mi .env.
 ```
 
 ## Añadir una cuenta
 
 ```
-Quiero añadir una cuenta más. Abre el panel para que yo agregue el proxy ahí; luego
-pruébalo, despliega y dime qué datos poner en el iPhone.
+Quiero añadir una cuenta más. Pídeme el proxy con `wa agent ask-proxy`; luego pruébalo,
+pide permiso para desplegar y dime qué datos poner en el iPhone.
 ```
 
 ## Rotar credenciales de proxy
 
 ```
-Voy a cambiar las credenciales de mis proxies en el panel. Cuando las guarde, prueba los
-proxies, despliega y confirma con las sondas que cada cuenta mantiene su IP.
+Quiero cambiar las credenciales de un proxy. Pídemelas con `wa agent ask-proxy --n N`;
+luego prueba los proxies, pide permiso para desplegar y confirma con las sondas que cada
+cuenta mantiene su IP.
 ```
 
 ## English
 
 ```
-Read AGENTS.md. Start the dashboard (start-dashboard.sh --no-open), give me the link and
-walk me step by step through setting up per-account WhatsApp proxies on my VPS. Confirm
-before touching the VPS. Never read my .env or ask me for passwords in chat.
+Read AGENTS.md. Open the dashboard with `wa agent open` and walk me step by step through
+setting up per-account WhatsApp proxies on my VPS. Ask me for credentials and permissions
+through the dashboard (wa agent), never in chat. Never read my .env.
 ```

@@ -5,7 +5,7 @@
 hosts.conf
 !hosts.conf.example
 
-# Generado por scripts/generate-compose.sh
+# Generado por `wa compose` / `wa deploy`
 docker-compose.yml
 
 # Copias de seguridad
@@ -16,3 +16,7 @@ docker-compose.yml
 *.tmp
 __pycache__/
 tests/.nokey*
+
+# Sesión del panel (token del agente) y Python portable de Windows
+.wa-session.json
+.python/

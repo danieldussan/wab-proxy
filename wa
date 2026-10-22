@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Lanzador para Linux y macOS:  ./wa <comando>     (por ejemplo: ./wa dashboard)
+cd "$(dirname "$0")" || exit 1
+for py in python3 python; do
+  if command -v "$py" >/dev/null 2>&1 && "$py" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)' 2>/dev/null; then
+    exec "$py" wa.py "$@"
+  fi
+done
+echo "Necesitas Python 3.8 o superior."
+case "$(uname -s)" in
+  Darwin) echo "En macOS:  xcode-select --install   (o:  brew install python)" ;;
+  *)      echo "En Ubuntu/Debian:  sudo apt install python3" ;;
+esac
+exit 1
